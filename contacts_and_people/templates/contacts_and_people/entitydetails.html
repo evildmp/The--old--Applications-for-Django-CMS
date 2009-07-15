@@ -1,0 +1,125 @@
+{% load mptt_tags %}
+{% load news_and_events_tags %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Entity variables and templatetags</title>
+<style>
+    body {font-family: "gill sans", "optima";}
+    dt {color: gray;}    
+    h1 {font-size: 120%;}
+    dl {border: 1px solid gray; margin: 1em; padding: 1em; background: #cef; width: 50%;}
+	.explanation {color: red; font-style: italic;}
+</style>    
+</head>
+<body>    
+
+<h1>Entity fields</h1>
+<dl>
+    <dt>entity</dt>
+    <dd>{{ entity }}</dd>
+    
+    <dt>entity.name</dt>
+    <dd>{{ entity.name }}</dd>
+    
+    <dt>entity.slug</dt>
+    <dd>{{ entity.slug }}</dd>
+    
+    <dt>entity.website</dt>
+    <dd>{{ entity.website }}</dd>
+    <dd class="explanation">(the associated Page in Django CMS (optional))</dd>
+    
+    <dt>entity.abstract_entity</dt>
+    <dd>{{ entity.abstract_entity }}</dd>
+    <dd class="explanation">(some entities are not real departments or offices, but collections or groupings of them)</dd>
+    
+    <dt>entity.parent</dt>
+    <dd>{{ entity.parent }}</dd>
+    
+    <dt>entity.display_parent</dt>
+    <dd>{{ entity.display_parent }}</dd>
+    <dd class="explanation">(some entities do not need to display their parent in addresses - (for example <em>Cardiff University School of Medicine</em> should not be followed by its parent, <em>Cardiff University)</em>)</dd>
+</dl>    
+
+<h1>Entity fields inherited from ContactInformation</h1>
+<dl>
+    <dt>entity.building</dt>
+    <dd>{{ entity.building }}</dd>
+    
+    <dt>entity.precise_location</dt>
+    <dd>{{ entity.precise_location }}</dd>
+    <dd class="explanation">not part of the postal address, but information for visitors (e.g. <em>3rd Floor</em>)</dd>
+    
+    <dt>entity.access_note</dt>
+    <dd>{{ entity.access_note }}</dd>
+    <dd class="explanation">e.g. <em>Visitors by appointment only</em></dd>
+    
+    <dt>entity.email</dt>
+    <dd>{{ entity.email }}</dd>
+    
+    <dt>entity.phone_number</dt>
+    <dd>{{ entity.phone_number }}</dd>
+        
+    <dt>entity.fax_number</dt>
+    <dd>{{ entity.fax_number }}</dd>
+</dl>    
+
+<h1>Creating a full address</h1>
+<h2>Build the ancestor list for the address</h2>
+<ul>   
+{% for item in entity.build_address %}
+    <li>{{ item }}</li>
+{% endfor %}
+</ul>
+<h2>Postal address part</h2>
+<p>These fields come from the Building and Site classes in <em>addresses</em>.</p> 
+<dl>
+    <dt>entity.building.name</dt>
+    <dd>{{ entity.building.name }}</dd>
+    
+    <dt>entity.building.number</dt>
+    <dd>{{ entity.building.number }}</dd>
+    
+    <dt>entity.building.street</dt>
+    <dd>{{ entity.building.street }}</dd>
+    
+    <dt>entity.building.additional_street_address</dt>
+    <dd>{{ entity.building.additional_street_address }}</dd>
+
+    <dt>entity.building.postcode</dt>
+    <dd>{{ entity.building.postcode }}</dd>
+    
+    <dt>entity.building.site.post_town</dt>
+    <dd>{{ entity.building.site.post_town }}</dd>
+
+    <dt>entity.building.country</dt>
+    <dd>{{ entity.building.site.country }}</dd>
+</dl>
+
+<h1>Getting the Entity's members - including all the entities within it</h1>
+<ul>
+    {% for person in entity.gather_members %}
+        <li><a href="{{ person.get_absolute_url }}">{{person}}</a></li>
+    {% endfor %}
+</ul>
+<h1>Getting related news stories for an entity</h1>
+<p class="explanation">If this page is marked as the webpage for an Entity, then we can retrieve any news items destined for it.</p>
+<ul>
+    {% for news_item in news %}
+        <li><a href="{{ news_item.get_absolute_url }}">{{news_item.headline}}</a></li>
+    {% endfor %}
+</ul>
+        
+<h1>Get all the entities in a tree</h1>            
+{% full_tree_for_model contacts_and_people.entity as entitylist %}
+    {% for item,structure in entitylist|tree_info %}
+        {% if structure.new_level %}<ul><li>{% else %}</li><li>
+        {% endif %}
+            <a href="{{ item.get_absolute_url }}">{{ item.name }}</a> 
+        {% for level in structure.closed_levels %}</li></ul>{% endfor %}
+    {% endfor %}
+            
+</body>
+</html>

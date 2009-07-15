@@ -1,0 +1,4 @@
+<ul class="news">{% for news_article in news %}
+    <li><a href="{{ news_article.get_absolute_url }}">{{news_article.short_title}}</a></li>
+    {% endfor %}
+</ul>

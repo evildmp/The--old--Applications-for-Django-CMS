@@ -1,0 +1,24 @@
+To install these applications:
+
+First, you need to have Django CMS 2 installed and working.
+
+Place contacts_and_people and news_and_events onto your PYTHONPATH.
+
+Add:
+
+    'news_and_events',
+    'contacts_and_people',
+
+to your INSTALLED_APPS.
+
+Add:
+
+    (r"^entity/(?P<slug>[-\w]+)/$", "contacts_and_people.views.entity"),
+    (r"^person/(?P<slug>[-\w]+)/$", "contacts_and_people.views.person"),
+    (r"^news/article/(?P<slug>[-\w]+)/$", "news_and_events.views.newsarticle"),
+    (r"^events/event/(?P<slug>[-\w]+)/$", "news_and_events.views.event"),
+
+to your urlpatterns = patterns in urls.py.
+
+A syncdb will be required.
+

@@ -1,0 +1,117 @@
+{% load mptt_tags %}
+{% load news_and_events_tags %}
+{% load contacts_and_people_tags %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Person variables and templatetags</title>
+<style>
+	body {font-family: "gill sans", "optima";}
+	dt {color: gray;}    
+	h1 {font-size: 130%;}
+	h2 {font-size: 120%;}
+	h3 {font-size: 110%;}
+	dl {border: 1px solid gray; margin: 1em; padding: 1em; background: #cef; width: 50%;}
+	.explanation {color: red; font-style: italic;}
+</style>    
+</head>
+<body>   
+    
+<h1>Person fields</h1>
+<dl>
+    <dt>person</dt>
+    <dd>{{ person }}</dd>
+    
+    <dt>person.title</dt>
+    <dd>{{ person.title }}</dd>
+    
+    <dt>person.given_name</dt>
+    <dd>{{ person.given_name }}</dd>
+    
+    <dt>person.middle_names</dt>
+    <dd>{{ person.middle_names }}</dd>
+    
+    <dt>person.surname</dt>
+    <dd>{{ person.surname }}</dd>
+    
+    <dt>person.slug</dt>
+    <dd>{{ person.slug }}</dd>
+    
+    <dt>person.entities</dt>
+    <dd>{{ person.entities }}</dd>
+    
+    <dt>person.home_person</dt>
+    <dd>{{ person.home_person }}</dd>
+    
+    <dt>person.please_contact</dt>
+    <dd>{{ person.please_contact }}</dd>    
+
+</dl>    
+
+<h1>Person fields inherited from ContactInformation</h1>
+
+<dl>
+    <dt>person.building</dt>
+    <dd>{{ person.building }}</dd>
+    
+    <dt>person.precise_location</dt>
+    <dd>{{ person.precise_location }}</dd>
+    <dd>not part of the postal address, but information for visitors (e.g. <em>3rd Floor</em>)</dd>
+    
+    <dt>person.access_note</dt>
+    <dd>{{ person.access_note }}</dd>
+    <dd>e.g. <em>Visitors by appointment only</em></dd>
+    
+    <dt>person.email</dt>
+    <dd>{{ person.email }}</dd>
+    
+    <dt>person.phone_number</dt>
+    <dd>{{ person.phone_number }}</dd>
+        
+    <dt>person.fax_number</dt>
+    <dd>{{ person.fax_number }}</dd>
+</dl>    
+
+<h1>Creating a full address</h1>
+<h2>Build the ancestor list for the address</h2>
+<ul>   
+{% for item in entity.build_address %}
+    <li>{{ item }}</li>
+{% endfor %}
+</ul>
+<h2>Postal address part</h2>
+<p>These fields come from the Building and Site classes in <em>addresses</em>.</p> 
+<p>The fields belong to the person's home_entity (in the view, <em>home_entity</em> is passed in as <em>entity</em>).</p> 
+<dl>
+    <dt>entity.building.name</dt>
+    <dd>{{ entity.building.name }}</dd>
+    
+    <dt>entity.building.number</dt>
+    <dd>{{ entity.building.number }}</dd>
+    
+    <dt>entity.building.street</dt>
+    <dd>{{ entity.building.street }}</dd>
+    
+    <dt>entity.building.additional_street_address</dt>
+    <dd>{{ entity.building.additional_street_address }}</dd>
+
+    <dt>entity.building.postcode</dt>
+    <dd>{{ entity.building.postcode }}</dd>
+    
+    <dt>entity.building.site.post_town</dt>
+    <dd>{{ entity.building.site.post_town }}</dd>
+
+    <dt>entity.building.country</dt>
+    <dd>{{ entity.building.site.country }}</dd>
+</dl>
+
+<h1>Displaying the entities a person belongs to</h1>
+<p class="explanation">This needs some improvement - at the moment it will only display the first tree's root node.</p> 
+<ul>
+	{% make_membership_tree entity.get_root %}
+</ul>
+
+</body>
+</html>

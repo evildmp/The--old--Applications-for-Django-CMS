@@ -1,0 +1,64 @@
+{% load mptt_tags %}
+{% load news_and_events_tags %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Events variables and templatetags</title>
+<style>
+    body {font-family: "gill sans", "optima";}
+    dt {color: gray;}    
+    h1 {font-size: 120%;}
+    dl {border: 1px solid gray; margin: 1em; padding: 1em; background: #cef; width: 50%;}
+	.explanation {color: red; font-style: italic;}
+</style>    
+</head>
+<body>
+	
+<h1>Events fields</h1>
+<dl>
+    <dt>event</dt>
+    <dd>{{ event }}</dd>
+
+    <dt>event.short_title</dt>
+    <dd>{{ event.short_title }}</dd>
+
+    <dt>event.summary</dt>
+    <dd>{{ event.summary }}</dd>
+
+    <dt>event.content</dt>
+    <dd>{{ event.content }}</dd>
+
+    <dt>event.please_contact</dt>
+    <dd>{{ event.please_contact }}</dd>
+
+    <dt>event.please_see</dt>
+    <dd>{{ event.please_see }}</dd>
+
+    <dt>event.date</dt>
+    <dd>{{ event.date }}</dd>
+    
+    <dt>event.date_end</dt>
+    <dd>{{ event.date_end }}</dd>
+    
+    <dt>event.related_articles</dt>
+    {% for item in event.related_articles.all %}
+        <dd>{{ item }}</dd>
+    {% endfor %}
+    
+    <dt>event.related_pages</dt>
+    {% for item in event.related_pages.all %}
+        <dd>{{ item }}</dd>
+    {% endfor %}
+    
+    <dt>event.related_people</dt>
+    {% for item in event.related_people.all %}
+        <dd>{{ item }}</dd>
+    {% endfor %}
+</dl>    
+	    
+
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+<ul class="news">{% for event in events %}
+    <li><a href="{{ event.get_absolute_url }}">{{event.short_title}}</a></li>
+    {% endfor %}
+</ul>
