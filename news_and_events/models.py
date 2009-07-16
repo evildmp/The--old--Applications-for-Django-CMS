@@ -33,8 +33,12 @@ class NewsAndEvents(models.Model):
         help_text = u"A page with further information", 
         null = True, blank = True
         )
-    related_articles = models.ManyToManyField(
-        'self', 
+    related_newsarticles = models.ManyToManyField(
+        'NewsArticle', 
+        null = True, blank = True
+        )
+    related_events = models.ManyToManyField(
+        'Event', 
         null = True, blank = True
         )
     related_pages = models.ManyToManyField(

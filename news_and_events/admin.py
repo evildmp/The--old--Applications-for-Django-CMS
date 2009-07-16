@@ -7,7 +7,7 @@ class NewsAndEventsAdmin(admin.ModelAdmin):
     list_display = ('short_title', 'date',)
     filter_horizontal = (
         'publishing_destinations', 
-        'related_articles', 
+        'related_newsarticles', 
         'related_pages', 
         'related_people',
         )
@@ -28,7 +28,7 @@ class NewsArticleAdmin(NewsAndEventsAdmin):
         }),
         ('Related articles, pages and people', {
             'classes': ('collapse',),
-            'fields': ('related_articles', 'related_pages', 'related_people',),
+            'fields': ('related_newsarticles', 'related_events','related_pages', 'related_people',),
         }),
         ('Additional options', {
             'classes': ('collapse',),
@@ -50,7 +50,7 @@ class EventAdmin(NewsAndEventsAdmin):
         }),
         ('Related articles, pages and people', {
             'classes': ('collapse',),
-            'fields': ('related_articles', 'related_pages', 'related_people',),
+            'fields': ('related_newsarticles', 'related_events','related_pages', 'related_people',),
         }),
         ('Additional options', {
             'classes': ('collapse',),

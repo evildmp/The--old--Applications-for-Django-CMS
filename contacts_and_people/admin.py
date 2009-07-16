@@ -21,7 +21,6 @@ class EntityAdmin(admin.ModelAdmin):
         'fields': ('slug',),
     }),
     )
-    print 'hello'
 
 admin.site.register(models.Entity,EntityAdmin)
 
