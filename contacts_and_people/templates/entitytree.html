@@ -1,6 +1,5 @@
 {% load contacts_and_people_tags %}
 {% if node %}
-    
     {% if not node.abstract_entity %}
         <li><a href="{{ node.get_absolute_url }}">
             {% ifequal person.home_entity node %}
@@ -12,7 +11,7 @@
         	{% if node.get_children %}
         	<ul>
         		{% for item in node.get_children %}
-        			{% make_membership_tree item %}
+        			{% make_membership_tree person item %}
         		{% endfor %}
         	</ul>
         	{% endif %}
@@ -20,7 +19,7 @@
     {% else %}    
         {% if node.get_children %}
     		{% for item in node.get_children %}
-    			{% make_membership_tree item %}
+    			{% make_membership_tree person item %}
     		{% endfor %}
     	{% endif %}
     {% endif %}
