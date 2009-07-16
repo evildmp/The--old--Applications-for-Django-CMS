@@ -1,19 +1,23 @@
+Methods
+=======
+
 Entity
-======
+------
 Each office, department, committee, centre within an institution is an Entity.
 Entities are organised into a hierarchy, for example:
-The University
-	Faculties
-	    Faculty of Humanities
-	        Department of Philosophy
-	            Philosophy Examination Board
+
+	The University
+		Faculties
+		    Faculty of Humanities
+		        Department of Philosophy
+		            Philosophy Examination Board
 
 
-Entity.gather_members()
+### Entity.gather_members()
 
 For an entity, and all its descendants, produces a list of members (it returns a set).
 
-Entity.build_address()
+### Entity.build_address()
 
 Assembles the institutional (as opposed to postal) part of an entity's address.
 
@@ -22,9 +26,9 @@ The build_address function allows us to eliminate unnecessary or undesired lines
 Also, we leave out abstract entities (e.g. "Faculties").
 
 Person
-======
+------
 
-Person.gather_entities()
+### Person.gather_entities()
 
 For a person, produces a list of entities that the person belongs to. It also includes all the descendants of these entities (if you belong to a child you belong to its parent). 
 
@@ -33,6 +37,7 @@ Templatetags
 ============
 
 {% make_membership_tree person root %}
+--------------------------------------
 
 For a person, will list all the entities they belong to, whether explicitly or implicitly, and make a tree to display them in.
 
@@ -40,7 +45,7 @@ root is the starting point of the tree.
 
 The easiest way to get root is by using MPTT's get_root, as in:
 
-{% make_membership_tree entity.get_root %}
+	{% make_membership_tree entity.get_root %}
 
 See http://www.jonathanbuchanan.plus.com/mptt/models.html for more on get_root.
 
