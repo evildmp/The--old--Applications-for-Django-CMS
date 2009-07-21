@@ -36,6 +36,8 @@ For a person, produces a list of entities that the person belongs to. It also in
 Templatetags
 ============
 
+in *contacts_and_people_tags.py*
+
 {% make_membership_tree person root %}
 --------------------------------------
 
@@ -43,13 +45,21 @@ For a person, will list all the entities they belong to, whether explicitly or i
 
 root is the starting point of the tree.
 
-The easiest way to get root is by using MPTT's get_root, as in:
+The easiest way to get root is by using MPTT's *get_root()*, as in:
 
 	{% make_membership_tree entity.get_root %}
 
-See http://www.jonathanbuchanan.plus.com/mptt/models.html for more on get_root.
+See http://www.jonathanbuchanan.plus.com/mptt/models.html for more on get_root().
 
 make_membership_tree recurses - it uses the template entitytree.html, which in turn calls make_membership tree, until they run out of tree nodes to process.
 
+{% find_entity_for_page page %}
+-------------------------------
 
+
+
+{% list_members_of_entity entity %}
+-----------------------------------
+
+For an entity, and all its descendants, produces a list of members. 
 

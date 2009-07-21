@@ -49,13 +49,6 @@ class ContactInformation(models.Model):
     fax_number = models.CharField(max_length=15, null = True, blank=True)
 
 class Entity(ContactInformation):
-    """	Each office, department, committee, centre within an institution is an Entity.
-	Entities are organised into a hierarchy, for example:
-	The University
-	    Faculty of Humanities
-	        Department of Philosophy
-	            Philosophy Examination Board
-	The ancestry_for_adddress function allows us to eliminate unnecessary or undesired lines from the ancestry for the purpose of constructing address. For example, "Cardiff University School of Medicine" does not need to show its parent ("Cardiff University") in its address."""
     class Meta:
         verbose_name_plural = "Entities"
         ordering = ['lft']

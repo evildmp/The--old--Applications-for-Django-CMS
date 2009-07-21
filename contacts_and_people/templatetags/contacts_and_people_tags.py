@@ -1,6 +1,7 @@
 from django import template
 from django.shortcuts import render_to_response
 from contacts_and_people.models import *
+from cms.models import Page
 
 from contacts_and_people.models import *
 
@@ -15,11 +16,21 @@ def make_membership_tree(context, person, node):
             'person': person,
             }
             
-@register.inclusion_tag('entitytree.html', takes_context=True)
-def list_members_of_entity(context, node):
-    person=context['person']
-    if node in person.gather_entities():
+@register.inclusion_tag('listofmembers.html', takes_context=True)
+def list_members_for_entity(context, page):
+    entity = find_entity_for_page(page)
+    if entity:
+        people = entity.gather_members()
         return {
-            'node': node,
-            'person': person,
-            }    
+            'people': people,
+            }  
+    else:
+        return {
+            'people': ["no","members",]
+            }
+            
+def find_entity_for_page(page):
+    try:
+        return page.entity.get()
+    except:
+        return find_entity_for_page(page.parent)
