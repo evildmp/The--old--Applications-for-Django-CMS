@@ -1,0 +1,7 @@
+{% load vacancies_and_studentships_tags %}
+
+<ul class="news">
+    {% for vacancy in vacancies %}
+        <li><a href="{{ vacancy.get_absolute_url }}">{{vacancy.short_title}}, {{ vacancy.host_entity }}</a></li>
+    {%endfor%}
+</ul>

@@ -1,0 +1,48 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Studentship variables and templatetags</title>
+<style>
+    body {font-family: "gill sans", "optima";}
+    dt {color: gray;}    
+    h1 {font-size: 120%;}
+    dl {border: 1px solid gray; margin: 1em; padding: 1em; background: #cef; width: 50%;}
+	.explanation {color: red; font-style: italic;}
+</style>    
+</head>
+<body>
+	
+<h1>Studentship fields</h1>
+<dl>
+    <dt>studentship</dt>
+    <dd>{{ studentship }}</dd>
+
+    <dt>studentship.short_title</dt>
+    <dd>{{ studentship.short_title }}</dd>
+
+    <dt>studentship.description</dt>
+    <dd>{{ studentship.description }}</dd>
+
+
+    <dt>studentship.please_contact</dt>
+    <dd>{{ studentship.please_contact }}</dd>
+
+    <dt>studentship.please_see</dt>
+    <dd>{{ studentship.please_see }}</dd>
+
+    <dt>studentship.start_date</dt>
+    <dd>{{ studentship.start_date }}</dd>
+        
+    <dt>studentship.host_entities</dt>
+    {% for item in studentship.host_entities.all %}
+        <dd>{{ item }}</dd>
+    {% endfor %}
+    </dt>
+</dl>    
+	    
+
+
+</body>
+</html>

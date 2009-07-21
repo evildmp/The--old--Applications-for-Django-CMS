@@ -81,6 +81,9 @@ class Entity(ContactInformation):
         return "/entity/%s/" % self.slug
 
 class Person(ContactInformation):
+    class Meta:
+        ordering = ['surname', 'given_name', 'user',]
+        verbose_name_plural = "People"
     user = models.ForeignKey(User, related_name = 'person_user', unique=True, )
     title = models.CharField(max_length=6)
     given_name = models.CharField(max_length=50)

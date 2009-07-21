@@ -25,7 +25,7 @@ class EntityAdmin(admin.ModelAdmin):
 admin.site.register(models.Entity,EntityAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('given_name', 'surname', 'user',)
+    list_display = ( 'surname', 'given_name', 'user',)
     list_editable = ('user',)
     filter_horizontal = ('entities',)
     prepopulated_fields = {

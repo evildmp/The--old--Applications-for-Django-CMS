@@ -1,0 +1,48 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Vacancy variables and templatetags</title>
+<style>
+    body {font-family: "gill sans", "optima";}
+    dt {color: gray;}    
+    h1 {font-size: 120%;}
+    dl {border: 1px solid gray; margin: 1em; padding: 1em; background: #cef; width: 50%;}
+	.explanation {color: red; font-style: italic;}
+</style>    
+</head>
+<body>
+	
+<h1>Vacancy fields</h1>
+<dl>
+    <dt>vacancy</dt>
+    <dd>{{ vacancy }}</dd>
+
+    <dt>vacancy.short_title</dt>
+    <dd>{{ vacancy.short_title }}</dd>
+
+    <dt>vacancy.description</dt>
+    <dd>{{ vacancy.description }}</dd>
+
+
+    <dt>vacancy.please_contact</dt>
+    <dd>{{ vacancy.please_contact }}</dd>
+
+    <dt>vacancy.please_see</dt>
+    <dd>{{ vacancy.please_see }}</dd>
+
+    <dt>vacancy.start_date</dt>
+    <dd>{{ vacancy.start_date }}</dd>
+        
+    <dt>vacancy.host_entities</dt>
+    {% for item in vacancy.host_entities.all %}
+        <dd>{{ item }}</dd>
+    {% endfor %}
+    </dt>
+</dl>    
+	    
+
+
+</body>
+</html>

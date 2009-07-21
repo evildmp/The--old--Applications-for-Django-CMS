@@ -16,38 +16,33 @@ class NewsAndEvents(models.Model):
         )
     summary = models.TextField()
     content = models.TextField()
-    publishing_destinations = models.ManyToManyField(
-        Entity, 
+    publishing_destinations = models.ManyToManyField(Entity, 
         help_text = u"Use these sensibly - don't send minor items to the home page, for example", 
         null = True, blank = True
         )
-    please_contact = models.ForeignKey(
-        Person, 
+    please_contact = models.ForeignKey(Person, 
         related_name = '%(class)s_person', 
         help_text = u'The person to whom enquiries about this should be directed ', 
         null = True, blank = True
         )
-    please_see = models.ForeignKey(
-        Page, 
+    please_see = models.ForeignKey(Page, 
         related_name="%(class)s_page", 
         help_text = u"A page with further information", 
         null = True, blank = True
         )
-    related_newsarticles = models.ManyToManyField(
-        'NewsArticle', 
+    related_newsarticles = models.ManyToManyField('NewsArticle', 
         null = True, blank = True
         )
-    related_events = models.ManyToManyField(
-        'Event', 
+    related_events = models.ManyToManyField('Event', 
         null = True, blank = True
         )
-    related_pages = models.ManyToManyField(
-        Page, related_name="%(class)s_pages", 
+    related_pages = models.ManyToManyField(Page, 
+        related_name="%(class)s_pages", 
         help_text = u"Other pages with <em>particular</em> relevance to this item", 
         null = True, blank = True
         )
-    related_people = models.ManyToManyField(
-        Person, related_name="%(class)s_people", 
+    related_people = models.ManyToManyField(Person, 
+        related_name="%(class)s_people", 
         help_text = u"People <em>named</em> in this item", 
         null = True, blank = True
         )

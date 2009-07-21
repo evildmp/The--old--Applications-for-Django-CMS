@@ -1,7 +1,7 @@
 {% load contacts_and_people_tags %}
 
-<ul>
+<ul class="news">
     {% for person in people %}
-        <li>{{person}}</li>
+        <li><a href="{{ person.get_absolute_url }}">{{person}}</a></li>
     {%endfor%}
 </ul>
