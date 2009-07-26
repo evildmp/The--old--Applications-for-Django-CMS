@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
     
 class EntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'parent', 'building', 'abstract_entity','website',)
-    list_editable = ('building', 'parent', 'abstract_entity','website',)
     prepopulated_fields = {
             'slug': ('name',)
             }

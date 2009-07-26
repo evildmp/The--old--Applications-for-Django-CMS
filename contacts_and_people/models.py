@@ -84,14 +84,14 @@ class Person(ContactInformation):
     class Meta:
         ordering = ['surname', 'given_name', 'user',]
         verbose_name_plural = "People"
-    user = models.ForeignKey(User, related_name = 'person_user', unique=True, )
+    user = models.ForeignKey(User, related_name = 'person_user', unique=True, blank = True, null = True)
     title = models.CharField(max_length=6)
     given_name = models.CharField(max_length=50)
     middle_names = models.CharField(max_length=100, blank = True, null = True)
     surname = models.CharField(max_length=50)
     slug = models.SlugField(help_text=u"Do not meddle with this unless you know exactly what you're doing!")
     entities = models.ManyToManyField(Entity, related_name = 'people', blank = True, null = True)
-    home_entity = models.ForeignKey(Entity, related_name = 'people_home')
+    home_entity = models.ForeignKey(Entity, related_name = 'people_home', blank = True, null = True)
     override_entity = models.ForeignKey(Entity, verbose_name = 'Override address', help_text= u"Get the person's address from an alternative entity", related_name = 'people_override', blank = True, null = True)
     please_contact = models.ForeignKey('self', help_text=u"Publish alternative contact details for this person", related_name='contact_for', blank = True, null = True)
     def gather_entities(self):
@@ -106,8 +106,6 @@ class Person(ContactInformation):
         return str(self.title + " " + self.given_name + " " + self.middle_names + " " + self.surname)
     def get_absolute_url(self):
         return "/person/%s/" % self.slug
-
-
 
 try:
     mptt.register(Entity)

@@ -1,6 +1,7 @@
 from django import template
 from django.shortcuts import render_to_response
 from contacts_and_people.models import *
+from contacts_and_people.functions import *
 from cms.models import *
 
 register = template.Library()
@@ -30,12 +31,6 @@ def list_studentships_for_entity(context, page):
        return {
            'studentships': ["no","studentships",]
            }
-
-def find_entity_for_page(page):
-   try:
-       return page.entity.get()
-   except:
-       return find_entity_for_page(page.parent)
 
 def gather_vacancies(entity):
    vacancylist = set()
