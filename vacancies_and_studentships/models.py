@@ -12,7 +12,6 @@ class CommonVacancyAndStudentshipInformation(models.Model):
     closing_date = models.DateField()
     description = models.TextField()
     host_entity = models.ForeignKey(Entity,
-        related_name = "%(class)s_host",
         help_text = u"The research group or department responsible for this vacancy")
     please_contact = models.ForeignKey(Person, 
         related_name = '%(class)s_person', 

@@ -2,7 +2,7 @@ from django import template
 from django.shortcuts import render_to_response
 from contacts_and_people.models import *
 from contacts_and_people.functions import *
-from cms.models import *
+from cms.models import Page
 
 register = template.Library()
 
@@ -35,13 +35,13 @@ def list_studentships_for_entity(context, page):
 def gather_vacancies(entity):
    vacancylist = set()
    for entity in entity.get_descendants(include_self = True):
-       vacancylist.update(entity.vacancy_host.all())
+       vacancylist.update(entity.vacancy_set.all())
        vacancylist.update(entity.vacancy_advertise_on.all())
    return vacancylist
 
 def gather_studentships(entity):
   studentshiplist = set()
   for entity in entity.get_descendants(include_self = True):
-      studentshiplist.update(entity.studentship_host.all())
+      studentshiplist.update(entity.studentship_set.all())
       studentshiplist.update(entity.studentship_advertise_on.all())
   return studentshiplist

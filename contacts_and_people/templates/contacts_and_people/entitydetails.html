@@ -1,5 +1,4 @@
 {% load mptt_tags %}
-{% load news_and_events_tags %}
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,13 +7,30 @@
     <title>Entity variables and templatetags</title>
 <style>
     body {font-family: "gill sans", "optima";}
-    dt {color: gray;}    
+    dt {color: gray;}   
     h1 {font-size: 120%;}
-    dl {border: 1px solid gray; margin: 1em; padding: 1em; background: #cef; width: 50%;}
-	.explanation {color: red; font-style: italic;}
+    h2 {font-size: 110%;}
+    dl {border: 1px solid gray; margin: 1em; padding: 1em; background: #cef; }
+	.explanation {color: #844; font-style: italic;}
 </style>    
 </head>
 <body>    
+<ul>
+{% for item in entity.members.all %}
+<li>{{item.person}} is 
+	{% if not item.role %}
+		a member of
+	{% else %}
+		{{item.role}} in 
+	{% endif %}
+	{{item.entity}}</li>
+{% endfor %}
+</ul>
+<ul>
+{% for item in entity.people.all %}
+<li>{{item}}</li>
+{% endfor %}
+</ul>
 
 <h1>Entity fields</h1>
 <dl>
@@ -41,10 +57,7 @@
     <dt>entity.display_parent</dt>
     <dd>{{ entity.display_parent }}</dd>
     <dd class="explanation">(some entities do not need to display their parent in addresses - (for example <em>Cardiff University School of Medicine</em> should not be followed by its parent, <em>Cardiff University)</em>)</dd>
-</dl>    
 
-<h1>Entity fields inherited from ContactInformation</h1>
-<dl>
     <dt>entity.building</dt>
     <dd>{{ entity.building }}</dd>
     
@@ -66,15 +79,7 @@
     <dd>{{ entity.fax_number }}</dd>
 </dl>    
 
-<h1>Creating a full address</h1>
-<h2>Build the ancestor list for the address</h2>
-<ul>   
-{% for item in entity.build_address %}
-    <li>{{ item }}</li>
-{% endfor %}
-</ul>
-<h2>Postal address part</h2>
-<p>These fields come from the Building and Site classes in <em>addresses</em>.</p> 
+<h1>Postal address</h1>
 <dl>
     <dt>entity.building.name</dt>
     <dd>{{ entity.building.name }}</dd>
@@ -98,19 +103,42 @@
     <dd>{{ entity.building.site.country }}</dd>
 </dl>
 
-<h1>Getting the Entity's members - including all the entities within it</h1>
+<h1>Members with job titles</h1>
+
 <ul>
     {% for person in entity.gather_members %}
-        <li><a href="{{ person.get_absolute_url }}">{{person}}</a></li>
+        <li>
+		 <a href="{{ person.get_absolute_url }}">{{person}}</a>
+		{% ifequal person.home_entity entity%}
+			{{ person.job_title }}
+		{% endifequal %}
+		</li>
     {% endfor %}
 </ul>
-<h1>Getting related news stories for an entity</h1>
-<p class="explanation">If this page is marked as the webpage for an Entity, then we can retrieve any news items destined for it.</p>
-<ul>
+
+<h1>News and events for an entity</h1>
+
+<dl>
+    <dt>News</dt>
     {% for news_item in news %}
-        <li><a href="{{ news_item.get_absolute_url }}">{{news_item.headline}}</a></li>
+    <dd><a href="{{ news_item.get_absolute_url }}">{{news_item.title}}</a></dd>
     {% endfor %}
-</ul>
+
+    <dt>Events</dt>
+    {% for event in events %}
+        <dd><a href="{{ event.get_absolute_url }}">{{event.title}}</a></d>
+    {% endfor %}
+
+    <dt>Vacancies</dt>
+    {% for vacancy in vacancies %}
+        <dd><a href="{{ vacancy.get_absolute_url }}">{{vacancy.title}}</a></dd>
+    {% endfor %}
+
+    <dt>Studentships</dt>
+    {% for studentship in studentships %}
+        <dd><a href="{{ studentship.get_absolute_url }}">{{studentship.title}}</a></dd>
+    {% endfor %}
+</dl>   
         
 <h1>Get all the entities in a tree</h1>            
 {% full_tree_for_model contacts_and_people.entity as entitylist %}

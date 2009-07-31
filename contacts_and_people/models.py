@@ -61,20 +61,6 @@ class Entity(ContactInformation):
     parent = models.ForeignKey('self', blank=True, null = True, related_name='children')
     display_parent = models.BooleanField(default=True, help_text=u'If the parent should appear in the address')
     website = models.ForeignKey(Page, related_name = 'entity', unique = True, null = True, blank=True)
-    def build_address(self):
-        ancestors = []
-        showparent = self.display_parent
-        for item in self.get_ancestors(ascending = True):
-            if showparent and (not item.abstract_entity):
-                ancestors.append(item)
-            showparent = item.display_parent
-        return ancestors
-    def gather_members(self):
-        memberlist = set()
-        for entity in self.get_descendants(include_self = True):
-            memberlist.update(entity.people_home.all())
-            memberlist.update(entity.people.all())
-        return memberlist
     def __unicode__(self):
         return self.name
     def get_absolute_url(self):
@@ -90,8 +76,9 @@ class Person(ContactInformation):
     middle_names = models.CharField(max_length=100, blank = True, null = True)
     surname = models.CharField(max_length=50)
     slug = models.SlugField(help_text=u"Do not meddle with this unless you know exactly what you're doing!")
-    entities = models.ManyToManyField(Entity, related_name = 'people', blank = True, null = True)
+    entities = models.ManyToManyField(Entity, related_name = 'people', through ='Membership', blank = True, null = True)
     home_entity = models.ForeignKey(Entity, related_name = 'people_home', blank = True, null = True)
+    job_title = models.CharField(max_length=50, blank = True, null = True)
     override_entity = models.ForeignKey(Entity, verbose_name = 'Override address', help_text= u"Get the person's address from an alternative entity", related_name = 'people_override', blank = True, null = True)
     please_contact = models.ForeignKey('self', help_text=u"Publish alternative contact details for this person", related_name='contact_for', blank = True, null = True)
     def gather_entities(self):
@@ -106,6 +93,15 @@ class Person(ContactInformation):
         return str(self.title + " " + self.given_name + " " + self.middle_names + " " + self.surname)
     def get_absolute_url(self):
         return "/person/%s/" % self.slug
+
+class Membership(models.Model):
+    person = models.ForeignKey(Person, related_name = 'member_of')
+    entity = models.ForeignKey(Entity, related_name='members')
+    role = models.CharField(max_length=64, null = True, blank = True)
+    key_member = models.BooleanField(default=False)
+    key_contact = models.BooleanField(default=False)
+    def __unicode__(self):
+        return str(self.person)
 
 try:
     mptt.register(Entity)

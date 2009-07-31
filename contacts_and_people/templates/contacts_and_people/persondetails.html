@@ -77,7 +77,7 @@
 <h1>Creating a full address</h1>
 <h2>Build the ancestor list for the address</h2>
 <ul>   
-{% for item in entity.build_address %}
+{% for item in home_entity.build_address %}
     <li>{{ item }}</li>
 {% endfor %}
 </ul>
@@ -85,33 +85,37 @@
 <p>These fields come from the Building and Site classes in <em>addresses</em>.</p> 
 <p>The fields belong to the person's home_entity (in the view, <em>home_entity</em> is passed in as <em>entity</em>).</p> 
 <dl>
-    <dt>entity.building.name</dt>
-    <dd>{{ entity.building.name }}</dd>
+    <dt>home_entity.building.name</dt>
+    <dd>{{ home_entity.building.name }}</dd>
     
-    <dt>entity.building.number</dt>
-    <dd>{{ entity.building.number }}</dd>
+    <dt>home_entity.building.number</dt>
+    <dd>{{ home_entity.building.number }}</dd>
     
-    <dt>entity.building.street</dt>
-    <dd>{{ entity.building.street }}</dd>
+    <dt>home_entity.building.street</dt>
+    <dd>{{ home_entity.building.street }}</dd>
     
-    <dt>entity.building.additional_street_address</dt>
-    <dd>{{ entity.building.additional_street_address }}</dd>
+    <dt>home_entity.building.additional_street_address</dt>
+    <dd>{{ home_entity.building.additional_street_address }}</dd>
 
-    <dt>entity.building.postcode</dt>
-    <dd>{{ entity.building.postcode }}</dd>
+    <dt>home_entity.building.postcode</dt>
+    <dd>{{ home_entity.building.postcode }}</dd>
     
-    <dt>entity.building.site.post_town</dt>
-    <dd>{{ entity.building.site.post_town }}</dd>
+    <dt>home_entity.building.site.post_town</dt>
+    <dd>{{ home_entity.building.site.post_town }}</dd>
 
-    <dt>entity.building.country</dt>
-    <dd>{{ entity.building.site.country }}</dd>
+    <dt>home_entity.building.country</dt>
+    <dd>{{ home_entity.building.site.country }}</dd>
 </dl>
 
 <h1>Displaying the entities a person belongs to</h1>
 <p class="explanation">This needs some improvement - at the moment it will only display the first tree's root node.</p> 
 <ul>
-	{% make_membership_tree person entity.get_root %}
+	{% make_membership_tree person home_entity.get_root %}
 </ul>
+{{ person.membership}}
 
+{% for entity in person.entities.all %}
+{{ entity }}{{ entity.role }}
+{% endfor %}
 </body>
 </html>

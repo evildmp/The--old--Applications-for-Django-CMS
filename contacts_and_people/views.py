@@ -6,10 +6,16 @@ from news_and_events.models import *
 def entity(request, slug):
     entity = Entity.objects.get(slug=slug)
     news = entity.newsarticle_set.all()
+    events = entity.event_set.all()
+    vacancies = entity.vacancy_set.all()
+    studentships = entity.studentship_set.all()
     return shortcuts.render_to_response(
         "contacts_and_people/entitydetails.html",
         {"entity":entity, 
-        "news": news, 
+        "news": news,
+        "events": events,
+        "vacancies": vacancies,
+        "studentships": studentships,
         }
         )
 
@@ -19,6 +25,6 @@ def person(request, slug):
     return shortcuts.render_to_response(
         "contacts_and_people/persondetails.html",
         {"person":person, 
-        "entity": home_entity
+        "home_entity": home_entity
         }
         )

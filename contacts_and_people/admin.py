@@ -2,8 +2,16 @@ import models
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-    
+class BuildingInline(admin.StackedInline):
+    model = models.Building
+    extra = 1
+
+class MembershipInline(admin.TabularInline):
+    model = models.Membership
+    extra = 1
+
 class EntityAdmin(admin.ModelAdmin):
+    inlines = (MembershipInline,)
     list_display = ('name', 'parent', 'building', 'abstract_entity','website',)
     prepopulated_fields = {
             'slug': ('name',)
@@ -21,9 +29,8 @@ class EntityAdmin(admin.ModelAdmin):
     }),
     )
 
-admin.site.register(models.Entity,EntityAdmin)
-
 class PersonAdmin(admin.ModelAdmin):
+    inlines = (MembershipInline,)
     list_display = ( 'surname', 'given_name', 'user',)
     list_editable = ('user',)
     filter_horizontal = ('entities',)
@@ -42,22 +49,24 @@ class PersonAdmin(admin.ModelAdmin):
         'fields': ('please_contact', 'override_entity',)
     }),
     ('Institutional details', {
-        'fields': ('home_entity', 'entities',)
+        'fields': ('home_entity', 'job_title',)
     }),    
     ('Advanced options', {
         'classes': ('collapse',),
         'fields': ('slug',),
     }),
     )
-admin.site.register(models.Person,PersonAdmin)
 
 class SiteAdmin(admin.ModelAdmin):
+    inlines = (BuildingInline,)
     list_display = ('site_name', 'post_town', 'country',)
     #list_editable = ('post_town', 'country',)
-admin.site.register(models.Site,SiteAdmin)
-    
+
 class BuildingAdmin(admin.ModelAdmin):
     #list_display = ('name', 'site',)
     pass
-admin.site.register(models.Building,BuildingAdmin)
 
+admin.site.register(models.Person,PersonAdmin)
+admin.site.register(models.Building,BuildingAdmin)
+admin.site.register(models.Entity,EntityAdmin)
+admin.site.register(models.Site,SiteAdmin)

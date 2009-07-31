@@ -1,0 +1,24 @@
+<dl>
+    <dt>Address</dt>
+    <dd><strong>{{ entity }}</strong> 
+        {% for item in address %}
+        <br />{{ item}}{% endfor %}
+    </dd>
+    
+{% if entity.email %}
+   <dt>Email address</dt>
+   <dd><a href="mailto:{{ entity.email }}">{{ entity.email }}</a></dd>
+{% endif %}
+    
+{% if entity.phone_number %}
+   <dt>Telephone</dt>
+   <dd>{{ entity.phone_number }}</dd>
+{% endif %}
+
+{% if entity.fax_number %}
+   <dt>Fax</dt>
+   <dd>{{ entity.fax_number }}</dd>
+{% endif %}
+
+
+</dl>
