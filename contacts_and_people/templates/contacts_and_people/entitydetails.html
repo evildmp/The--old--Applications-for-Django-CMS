@@ -14,7 +14,8 @@
 	.explanation {color: #844; font-style: italic;}
 </style>    
 </head>
-<body>    
+<body> 
+{{ entity.people.all }}   
 <ul>
 {% for item in entity.members.all %}
 <li>{{item.person}} is 

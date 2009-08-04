@@ -110,7 +110,7 @@
 <h1>Displaying the entities a person belongs to</h1>
 <p class="explanation">This needs some improvement - at the moment it will only display the first tree's root node.</p> 
 <ul>
-	{% make_membership_tree person home_entity.get_root %}
+	{ % make_membership_tree person home_entity.get_root % }
 </ul>
 {{ person.membership}}
 

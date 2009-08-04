@@ -1,6 +1,7 @@
 from django.db import models
 from cms.models import Page, CMSPlugin
 from django.contrib.auth.models import User
+from django import forms
 
 import mptt
 import operator
@@ -75,16 +76,16 @@ class Person(ContactInformation):
     given_name = models.CharField(max_length=50)
     middle_names = models.CharField(max_length=100, blank = True, null = True)
     surname = models.CharField(max_length=50)
-    slug = models.SlugField(help_text=u"Do not meddle with this unless you know exactly what you're doing!")
+    slug = models.SlugField(help_text=u"Do not meddle with this unless you know exactly what you're doing!", unique = True)
     entities = models.ManyToManyField(Entity, related_name = 'people', through ='Membership', blank = True, null = True)
-    home_entity = models.ForeignKey(Entity, related_name = 'people_home', blank = True, null = True)
-    job_title = models.CharField(max_length=50, blank = True, null = True)
+#    home_entity = models.ForeignKey(Entity, related_name = 'people_home', blank = True, null = True)
+#    job_title = models.CharField(max_length=50, blank = True, null = True)
     override_entity = models.ForeignKey(Entity, verbose_name = 'Override address', help_text= u"Get the person's address from an alternative entity", related_name = 'people_override', blank = True, null = True)
     please_contact = models.ForeignKey('self', help_text=u"Publish alternative contact details for this person", related_name='contact_for', blank = True, null = True)
     def gather_entities(self):
         entitylist = set()
-        entitylist.add(self.home_entity)
-        entitylist.update(self.home_entity.get_ancestors())
+#        entitylist.add(self.home_entity)
+#        entitylist.update(self.home_entity.get_ancestors())
         for entity in self.entities.all():
             entitylist.add(entity)
             entitylist.update(entity.get_ancestors())
@@ -96,10 +97,18 @@ class Person(ContactInformation):
 
 class Membership(models.Model):
     person = models.ForeignKey(Person, related_name = 'member_of')
-    entity = models.ForeignKey(Entity, related_name='members')
+    entity = models.ForeignKey(Entity, related_name='members', limit_choices_to  = {'abstract_entity': False})
+    home = models.BooleanField(default=False)
     role = models.CharField(max_length=64, null = True, blank = True)
     key_member = models.BooleanField(default=False)
     key_contact = models.BooleanField(default=False)
+    def save(self):
+        if self.home:
+            for item in Membership.objects.filter(person = self.person): 
+                item.home = False
+                super(Membership, item).save()
+            self.home = True  
+        super(Membership, self).save()
     def __unicode__(self):
         return str(self.person)
 

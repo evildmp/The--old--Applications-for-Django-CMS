@@ -1,0 +1,14 @@
+{% if key_people %}
+	<dl>
+		{% for person,roles in key_people.items %}
+			<dt><a href="{{ person.person.get_absolute_url }}">{{ person }}</a></dt>
+			{% for role in roles %}
+				<dd>{{ role }}</dd>
+			{% endfor %}
+		{% endfor %}
+		<dt>Address</dt>
+	    <dd><strong>{{ entity }}</strong> <br />
+	       {{ address|join:"<br>" }}
+	    </dd>
+	</dl>
+{% endif %}

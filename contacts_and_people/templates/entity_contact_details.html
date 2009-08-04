@@ -1,8 +1,16 @@
 <dl>
+	{% if contacts %}
+		<dt>Contact</dt>
+		{% for contact in contacts %}
+		<dd><a href="{{ contact.get_absolute_url }}">{{ contact }}</a>{%if contact.role %}, {{ contact.role }}
+			{% endif %}
+		</dd>
+		{% endfor %}
+	{% endif %}
+	
     <dt>Address</dt>
-    <dd><strong>{{ entity }}</strong> 
-        {% for item in address %}
-        <br />{{ item}}{% endfor %}
+    <dd><strong>{{ entity }}</strong> <br />
+       {{ address|join:"<br>" }}
     </dd>
     
 {% if entity.email %}
@@ -19,6 +27,4 @@
    <dt>Fax</dt>
    <dd>{{ entity.fax_number }}</dd>
 {% endif %}
-
-
 </dl>
