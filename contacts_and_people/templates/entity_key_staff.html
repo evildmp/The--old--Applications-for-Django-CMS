@@ -1,14 +1,13 @@
-{% if key_people %}
+{% if membership_list %}
+{% regroup membership_list by person as person_list %}
 	<dl>
-		{% for person,roles in key_people.items %}
-			<dt><a href="{{ person.person.get_absolute_url }}">{{ person }}</a></dt>
-			{% for role in roles %}
-				<dd>{{ role }}</dd>
-			{% endfor %}
+		{% for person in person_list %}
+			<dt><a href="{{ person.grouper.get_absolute_url }}">{{ person.grouper }}</a></dt>
+			{% for role in person.list %}<dd>{{role.role}}</dd>{% endfor %}
 		{% endfor %}
-		<dt>Address</dt>
-	    <dd><strong>{{ entity }}</strong> <br />
-	       {{ address|join:"<br>" }}
-	    </dd>
 	</dl>
 {% endif %}
+
+{% for item in role_list %}
+{{ item.role.plural }}
+{% endfor %}

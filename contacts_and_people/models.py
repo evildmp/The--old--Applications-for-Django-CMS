@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django import forms
 
 import mptt
-import operator
 
 class Site(models.Model):
     """Maintains a list of an institution's geographical sites"""
@@ -62,21 +61,28 @@ class Entity(ContactInformation):
     parent = models.ForeignKey('self', blank=True, null = True, related_name='children')
     display_parent = models.BooleanField(default=True, help_text=u'If the parent should appear in the address')
     website = models.ForeignKey(Page, related_name = 'entity', unique = True, null = True, blank=True)
+#    roles = models.ManyToManyField('Role', null = True, blank=True)
     def __unicode__(self):
         return self.name
     def get_absolute_url(self):
         return "/entity/%s/" % self.slug
+
+class Title(models.Model):
+    title = models.CharField (max_length = 50, unique = True)
+    abbreviation = models.CharField (max_length = 20)
+    def __unicode__(self):
+        return str(self.title)
 
 class Person(ContactInformation):
     class Meta:
         ordering = ['surname', 'given_name', 'user',]
         verbose_name_plural = "People"
     user = models.ForeignKey(User, related_name = 'person_user', unique=True, blank = True, null = True)
-    title = models.CharField(max_length=6)
-    given_name = models.CharField(max_length=50)
+    title = models.ForeignKey(Title, related_name = 'people', blank = True, null = True)
+    given_name = models.CharField(max_length=50, blank = True, null = True)
     middle_names = models.CharField(max_length=100, blank = True, null = True)
     surname = models.CharField(max_length=50)
-    slug = models.SlugField(help_text=u"Do not meddle with this unless you know exactly what you're doing!", unique = True)
+    slug = models.SlugField(help_text=u"Do not meddle with this unless you know exactly what you're doing!")
     entities = models.ManyToManyField(Entity, related_name = 'people', through ='Membership', blank = True, null = True)
 #    home_entity = models.ForeignKey(Entity, related_name = 'people_home', blank = True, null = True)
 #    job_title = models.CharField(max_length=50, blank = True, null = True)
@@ -91,17 +97,23 @@ class Person(ContactInformation):
             entitylist.update(entity.get_ancestors())
         return entitylist
     def __unicode__(self):
-        return str(self.title + " " + self.given_name + " " + self.middle_names + " " + self.surname)
+        return str(self.given_name + " " + self.middle_names + " " + self.surname)
     def get_absolute_url(self):
         return "/person/%s/" % self.slug
 
 class Membership(models.Model):
+    class Meta:
+        ordering = ('membership_order',)
     person = models.ForeignKey(Person, related_name = 'member_of')
     entity = models.ForeignKey(Entity, related_name='members', limit_choices_to  = {'abstract_entity': False})
     home = models.BooleanField(default=False)
-    role = models.CharField(max_length=64, null = True, blank = True)
+#    role = models.ForeignKey(Role, related_name = "bob", null = True, blank = True)
+    role = models.CharField(max_length = 50, null = True, blank = True)
+    role_plural = models.CharField(max_length = 50, null = True, blank = True, help_text = "e.g. 'Director of Research' becomes 'Directors of Research'")    
     key_member = models.BooleanField(default=False)
     key_contact = models.BooleanField(default=False)
+    order = models.IntegerField(blank = True, null = True)
+    membership_order = models.IntegerField(blank = True, null = True)
     def save(self):
         if self.home:
             for item in Membership.objects.filter(person = self.person): 

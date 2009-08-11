@@ -1,0 +1,6 @@
+<dl>
+	{% for person in member_list %}
+			<dt><a href="{{ person.get_absolute_url }}">{{ person }}</a></dt>
+			<dd>{{ person.membership.role}}{% ifnotequal entity person.membership.entity %}, <a href="{{person.membership.entity.get_absolute_url}}">{{ person.membership.entity }}</a>{% endifnotequal %}</dd>
+		{% endfor %}
+</dl>

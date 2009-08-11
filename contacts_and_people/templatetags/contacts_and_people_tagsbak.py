@@ -1,11 +1,7 @@
 from django import template
-from django.db.models import Q
 from django.shortcuts import render_to_response
-# is this indiscriminate import a good idea?
 from contacts_and_people.models import *
 from cms.models import Page
-
-import operator
 
 register = template.Library()    
 
@@ -21,44 +17,51 @@ def make_membership_tree(context, person, node):
             'node': node,
             'person': person,
             }
-
-    request = context['request']
-    entity = entity_for_page(request.current_page)
-
-
             
-@register.inclusion_tag('entity_list_members.html', takes_context=True)
-def entity_list_members(context):
+@register.inclusion_tag('list_of_members.html', takes_context=True)
+def list_members_for_entity(context):
     """
-   For an Entity, returns a list of members who have roles. 
+    Lists the members of an entity.
     
-    The entity is determined by looking up which Entity has been attached to the Page. If there is no such Entity, the closest one in its ancestors will be used.
-    
-    {% entity_info 'roles'} will list all members of the entity with defined roles. For each member, one role will be chosen, in the following order of preference:
-    
-    1.   roles for this entity - if multiple roles exist, the home role (if it exists) is selected; failing that the order given to roles in the Person Admin is used (Membership.order).
-    2.   the person's home role elsewhere, if it exists
-    3.   other roles people have elsewhere, if they exist, ordered by their Membership.order
+    Drop {% all_staff_for_entity %} into a template.
     """
     request = context['request']
     entity = entity_for_page(request.current_page)
-    members = list(members_for_entity(entity))
-    members.sort(key=operator.attrgetter('surname', 'given_name', 'middle_names'))
-    member_list = []
+    members = members_for_entity(entity)
+    members =list(members)
+    members.sort()
+    people = {}
+    stuff = []
     for member in members:
-        memberships = []
         ms = Membership.objects.filter(
             person = member)
-        memberships = list(ms.filter(entity=entity).exclude(role ="").order_by('-home', 'order')) # persons's role(s) for this entity
-        memberships.extend(ms.filter(home = True).exclude(entity=entity)) # person's home somewhere else
-        memberships.extend(ms.filter(home = False).exclude(entity = entity).exclude(role ="").order_by('order')) # person's role(s) are somewhere else
-        if memberships:
-            member.membership = memberships[0]
-            member_list.append(member)  
-
+        # maybe person's home is *this* entity
+        result = ms.filter(entity = entity, home = True)
+        if result:
+            print str(member) + "'s home is here"
+            print member.surname
+            stuff.append({member: result})
+            people.setdefault(member,[]).extend(result)
+        # perhaps the person has one or more roles here
+        else:
+            result = ms.filter(entity = entity).exclude(role ="")            
+            if result:
+                print str(member) + "has a role here"
+                people.setdefault(member,[]).extend(result)
+            # perhaps the person has a home in some other entity
+            else:   
+                result = ms.filter(home = True)
+                if result:
+                    print str(member) + "'s home is somewhere else"
+                    people.setdefault(member,[]).extend(result)
+                else:    
+                    people.setdefault(member,[]).extend(result)
+                    print str(member) + " is a member, but we don't have much information to display"
+    print people
     return {
         'entity' : entity,
-        'member_list': member_list
+        'people': people,
+        'stuff': stuff
             }  
 
 @register.inclusion_tag('entity_contact_details.html', takes_context=True)
@@ -68,7 +71,9 @@ def contact_details_for_entity(context):
     """
     request = context['request']
     entity = entity_for_page(request.current_page)
-    contacts = Membership.objects.filter(entity = entity, key_contact = True).order_by('membership_order')
+    contacts = Membership.objects.filter(
+        entity = entity,
+        key_contact = True)
     address = address_for_entity(entity)
     return {
             'entity' : entity,
@@ -83,54 +88,19 @@ def key_staff_for_entity(context):
     """
     request = context['request']
     entity = entity_for_page(request.current_page)
-    """
-    In this organisation, there are several roles, in order of importance, contained in the list 'memberships':
-    
-    1.  Prime Minister
-    2.  Deputy Prime Minister
-    3.  Minister of Foreign Affairs
-    4.  Minister of Car Parks
-    
-    We want to display:
-    
-    Ruth
-        Prime Minister
-    Bob
-        Deputy Prime Minister
-        Minister of Car Parks
-    Anne
-        Minister of Foreign Affairs
-        
-    Even though Bob has more than one role, his most important role determines his place in the listing (above Anne).
-    """  
-    # get the ordered list of roles for this organisation
-    memberships = Membership.objects.filter(entity = entity,key_member = True).order_by('membership_order',)
-    print memberships
+    key_roles = (Membership.objects.filter(
+        entity = entity,
+        key_member = True))
+    key_people = {}
+    for role in key_roles:
+        key_people.setdefault(role.person,[]).append(role.role)  
+    return {
+            'entity' : entity,
+            'key_people': key_people,
+            'address': address_for_entity(entity),
+        }
 
-    # create a dictionary of memberships for reference, and a list for output
-    membership_dict = {}
-    membership_list = []
-    
-    # make a dictionary, {membership_order:membership }, for reference: {1:Ruth, 2:Bob, 3:Anne, 4:Bob}
-    for index,membership in enumerate(memberships):
-        membership_dict[index]=membership
-    
-    # go through the membership list again
-    for index,membership in enumerate(memberships):
-        
-        # if this one is in the dictionary, add it and all other memberships for the person to our list
-        if index in membership_dict:
-            all_persons_memberships = membership.person.member_of.filter(entity=entity, key_member = True)
-            membership_list.extend(all_persons_memberships)
-            
-            # delete all memberships for this member from the dictionary, so we don't pick them up next time round
-            for persons_membership in list(all_persons_memberships):
-                for p_index in membership_dict:
-                    if membership_dict[p_index] == persons_membership:
-                        membership_dict[p_index] == None
-    
-    # returns a list of memberships, in the right order - we use a regroup tag to group them by person in the template    
-    return {'membership_list': membership_list, 'role_list': memberships}
+
 
 @register.simple_tag
 # think we need some error checking here, in case we get to the last ancestor page without having found an entity
