@@ -1,6 +1,6 @@
 import django.http as http
 import django.shortcuts as shortcuts
-from models import Person
+from models import Person, Building, Site
 from news_and_events.models import *
         
 def entity(request, slug):
@@ -21,10 +21,20 @@ def entity(request, slug):
 
 def person(request, slug):
     person = Person.objects.get(slug=slug)
-#    home_entity = person.home_entity
     return shortcuts.render_to_response(
         "contacts_and_people/persondetails.html",
         {"person":person, 
- #       "home_entity": home_entity
+        }
+        )
+        
+def place(request, slug):
+    from django.conf import settings # is this the best place to do this?
+    key = GOOGLE_MAPS_API_KEY = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+    place = Building.objects.get(slug=slug)
+    print key
+    return shortcuts.render_to_response(
+        "cardiffmap.html",
+        {"place":place, 
+        "key": key,
         }
         )

@@ -79,58 +79,36 @@ def contact_details_for_entity(context):
 @register.inclusion_tag('entity_key_staff.html', takes_context=True)
 def key_staff_for_entity(context):
     """
-    Drop {% key_staff_for_entity %} into a template.
+    Drop {% key_staff_for_entity %} into a template - returns an ordered list of memberships, grouped by people
     """
     request = context['request']
     entity = entity_for_page(request.current_page)
-    """
-    In this organisation, there are several roles, in order of importance, contained in the list 'memberships':
-    
-    1.  Prime Minister
-    2.  Deputy Prime Minister
-    3.  Minister of Foreign Affairs
-    4.  Minister of Car Parks
-    
-    We want to display:
-    
-    Ruth
-        Prime Minister
-    Bob
-        Deputy Prime Minister
-        Minister of Car Parks
-    Anne
-        Minister of Foreign Affairs
-        
-    Even though Bob has more than one role, his most important role determines his place in the listing (above Anne).
-    """  
-    # get the ordered list of roles for this organisation
-    memberships = Membership.objects.filter(entity = entity,key_member = True).order_by('membership_order',)
-    print memberships
-
-    # create a dictionary of memberships for reference, and a list for output
-    membership_dict = {}
+    memberships = Membership.objects.filter(entity = entity,key_member = True).order_by('membership_order',)    
+    duplicates = set()
     membership_list = []
-    
-    # make a dictionary, {membership_order:membership }, for reference: {1:Ruth, 2:Bob, 3:Anne, 4:Bob}
-    for index,membership in enumerate(memberships):
-        membership_dict[index]=membership
-    
-    # go through the membership list again
-    for index,membership in enumerate(memberships):
-        
-        # if this one is in the dictionary, add it and all other memberships for the person to our list
-        if index in membership_dict:
-            all_persons_memberships = membership.person.member_of.filter(entity=entity, key_member = True)
-            membership_list.extend(all_persons_memberships)
-            
-            # delete all memberships for this member from the dictionary, so we don't pick them up next time round
-            for persons_membership in list(all_persons_memberships):
-                for p_index in membership_dict:
-                    if membership_dict[p_index] == persons_membership:
-                        membership_dict[p_index] == None
-    
+    for membership in memberships:
+        if membership not in duplicates:
+            duplicates.add(membership)
+            membership_list.append(membership)
     # returns a list of memberships, in the right order - we use a regroup tag to group them by person in the template    
-    return {'membership_list': membership_list, 'role_list': memberships}
+    return {'membership_list': membership_list}
+    
+@register.inclusion_tag('entity_key_roles.html', takes_context=True)
+def key_roles_for_entity(context):   
+    """
+    Drop {% key_roles_for_entity %} into a template - returns an ordered list of people grouped by their most significant roles in the entity
+    """
+    request = context['request']
+    entity = entity_for_page(request.current_page)
+    memberships = Membership.objects.filter(entity = entity).exclude(role="").order_by('membership_order',) 
+    duplicates = set()
+    membership_list = []
+    for membership in memberships:
+        if membership.role_plural not in duplicates:
+            duplicates.add(membership.role_plural)
+            membership_list.extend(memberships.filter(role_plural = membership.role_plural))
+    # returns a list of memberships, in the right order - we use a regroup tag to group them by person in the template    
+    return {'membership_list': membership_list}
 
 @register.simple_tag
 # think we need some error checking here, in case we get to the last ancestor page without having found an entity
@@ -167,6 +145,7 @@ def building_for_entity(entity): # may need some error checking when for we get 
     else:
         return building_for_entity(entity.parent)
 
+@register.simple_tag
 def postal_address_for_building(building):
     """
     assembles the postal (external) parts of an address - assumes that the entity really does have a building

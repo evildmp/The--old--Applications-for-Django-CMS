@@ -29,25 +29,29 @@ class MembershipForEntityInline(MembershipInline): # for Entity admin
     exclude = ('order',)
 
 class MembershipForPersonInline(MembershipInline): # for Person admin
+    class Meta:
+        ordering = ('entity',)
     exclude = ('membership_order',)
 
 class PersonForm(forms.ModelForm):
     model = models.Person
+    print "sorting person order!"
     class Media:
         js = (
             '/media/jquery/development-bundle/jquery-1.3.2.js',
             '/media/jquery/development-bundle/ui/ui.core.js',
             '/media/jquery/development-bundle/ui/ui.sortable.js',
-            '/media/jquery/menu-sort.js',)
+            '/media/jquery/menu-sort-people.js',)
 
 class EntityForm(forms.ModelForm):
     model = models.Entity
+    print "sorting entity order!"
     class Media:
         js = (
             '/media/jquery/development-bundle/jquery-1.3.2.js',
             '/media/jquery/development-bundle/ui/ui.core.js',
             '/media/jquery/development-bundle/ui/ui.sortable.js',
-            '/media/jquery/menu-sort.js',
+            '/media/jquery/menu-sort-entity.js',
         )
 
 class PersonAdmin(admin.ModelAdmin):
@@ -113,10 +117,8 @@ class BuildingInline(admin.StackedInline):
     extra = 1
 
 class SiteAdmin(admin.ModelAdmin):
-    inlines = (BuildingInline,)
     list_display = ('site_name', 'post_town', 'country',)
-    #list_editable = ('post_town', 'country',)
-
+        
 class BuildingAdmin(admin.ModelAdmin):
     #list_display = ('name', 'site',)
     form = BuildingAdminForm
@@ -124,8 +126,15 @@ class BuildingAdmin(admin.ModelAdmin):
 class TitleAdmin(admin.ModelAdmin):
     pass
 
+class MembershipAdmin(admin.ModelAdmin):
+    list_display = ('person', 'entity', 'order', 'membership_order',)
+    ordering = ['person',]
+    
+
+
 admin.site.register(models.Person,PersonAdmin)
 admin.site.register(models.Building,BuildingAdmin)
 admin.site.register(models.Entity,EntityAdmin)
 admin.site.register(models.Site,SiteAdmin)
 admin.site.register(models.Title,TitleAdmin)
+admin.site.register(models.Membership,MembershipAdmin)

@@ -1,6 +1,7 @@
 from django.db import models
 from cms.models import Page, CMSPlugin
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 from django import forms
 
 import mptt
@@ -12,6 +13,7 @@ class Site(models.Model):
     site_name = models.CharField(max_length=50, unique=True)
     post_town = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
+    description = models.TextField(max_length = 500, null = True, blank=True)
     def __unicode__(self):
         return self.site_name
 
@@ -25,6 +27,9 @@ class Building(models.Model):
     additional_street_address = models.CharField(help_text=u"If required", max_length=100, null = True, blank=True)
     postcode = models.CharField(max_length=9, null = True, blank=True)
     site = models.ForeignKey(Site)
+    slug = models.SlugField(null = True, blank=True)
+    longitude = models.FloatField()
+    latitude = models.FloatField()    
     def __unicode__(self):
         if self.name:
             building_identifier = str(self.site) + ": " + self.name
@@ -33,6 +38,11 @@ class Building(models.Model):
         else:
             building_identifier = str(self.site) + ": " + self.postcode
         return building_identifier
+    def save(self):
+        self.slug = slugify(self.__unicode__())
+        super(Building, self).save()
+    def get_absolute_url(self):
+        return "/places/%s/" % self.slug
 
 class ContactInformation(models.Model):
     class Meta:
@@ -103,7 +113,7 @@ class Person(ContactInformation):
 
 class Membership(models.Model):
     class Meta:
-        ordering = ('membership_order',)
+        ordering = ('order',)
     person = models.ForeignKey(Person, related_name = 'member_of')
     entity = models.ForeignKey(Entity, related_name='members', limit_choices_to  = {'abstract_entity': False})
     home = models.BooleanField(default=False)
