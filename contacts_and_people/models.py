@@ -113,13 +113,14 @@ class Person(ContactInformation):
 
 class Membership(models.Model):
     class Meta:
-        ordering = ('order',)
+        ordering = ('membership_order',)
     person = models.ForeignKey(Person, related_name = 'member_of')
     entity = models.ForeignKey(Entity, related_name='members', limit_choices_to  = {'abstract_entity': False})
+    display_role = models.ForeignKey('self', related_name = "display_roles", null = True, blank = True)
     home = models.BooleanField(default=False)
 #    role = models.ForeignKey(Role, related_name = "bob", null = True, blank = True)
     role = models.CharField(max_length = 50, null = True, blank = True)
-    role_plural = models.CharField(max_length = 50, null = True, blank = True, help_text = "e.g. 'Director of Research' becomes 'Directors of Research'")    
+    role_plural = models.CharField(max_length = 50, null = True, blank = True, help_text = "e.g. 'Director of Research' becomes 'Directors of Research'")
     key_member = models.BooleanField(default=False)
     key_contact = models.BooleanField(default=False)
     order = models.IntegerField(blank = True, null = True)
@@ -132,7 +133,7 @@ class Membership(models.Model):
             self.home = True  
         super(Membership, self).save()
     def __unicode__(self):
-        return str(self.person)
+        return str(self.person) + "-" + str(self.entity) + "-" + str(self.role)
 
 try:
     mptt.register(Entity)

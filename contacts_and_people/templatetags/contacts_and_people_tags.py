@@ -46,15 +46,21 @@ def entity_list_members(context):
     members.sort(key=operator.attrgetter('surname', 'given_name', 'middle_names'))
     member_list = []
     for member in members:
-        memberships = []
-        ms = Membership.objects.filter(
-            person = member)
-        memberships = list(ms.filter(entity=entity).exclude(role ="").order_by('-home', 'order')) # persons's role(s) for this entity
-        memberships.extend(ms.filter(home = True).exclude(entity=entity)) # person's home somewhere else
-        memberships.extend(ms.filter(home = False).exclude(entity = entity).exclude(role ="").order_by('order')) # person's role(s) are somewhere else
-        if memberships:
-            member.membership = memberships[0]
-            member_list.append(member)  
+        memberships =[]
+        ms = Membership.objects.filter(person = member)
+        named_memberships = list(ms.filter(entity=entity).exclude(role ="").order_by('-home', 'order')) # persons's role(s) for this entity
+        if not named_memberships == []:
+            member.membership = named_memberships[0]
+            print named_memberships[0]
+            member_list.append(member)
+        else:
+            unnamed_memberships = list(ms.exclude(display_role = None).order_by('order',)) # get unnamed roles in this entity with display_role
+            if not unnamed_memberships == []:
+                print unnamed_memberships
+                member.membership = unnamed_memberships[0].display_role
+                print unnamed_memberships[0]
+                member_list.append(member)
+        # we still need to add two more cases: use home entity if nothing better is available, and use nothing if nothingis available (but still list the member(probably)
 
     return {
         'entity' : entity,

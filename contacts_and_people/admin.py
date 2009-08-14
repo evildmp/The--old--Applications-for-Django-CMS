@@ -1,11 +1,28 @@
 import models
 from django.db.models import F
+from django.db.models import Q
+
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django import forms
 from django.forms import ValidationError
 
 class MembershipForm(forms.ModelForm): # cleans up membership & role information
+    pass
+"""
+    def __init__(self, *args, **kwargs):
+        super(MembershipForm, self).__init__(*args, **kwargs)
+#        print dir(self.instance)
+#        try:
+#            #Try and set the selected_cat field from instance if it exists
+#            self.fields['selected_person'].initial = self.instance.subcategory.category.id
+#        except:
+#            pass
+    #The membership model is defined with out the category, so add one in for display
+    category = forms.ModelChoiceField(queryset = models.Membership.objects.all().order_by('name'), widget=forms.Select(attrs={'id':'category'}), required=False)
+    #This field is used exclusively for the javascript so that I can select the 
+    #correct category when editing an existing product
+    selected_cat = forms.CharField(widget=forms.HiddenInput, required=False)
     class Meta:
         model = models.Membership
     def clean(self):
@@ -19,6 +36,13 @@ class MembershipForm(forms.ModelForm): # cleans up membership & role information
             print "fixing plural roles"
             self.cleaned_data["role_plural"] = self.cleaned_data["role"]
         return self.cleaned_data
+    class Media:
+        #Alter these paths depending on where you put your media 
+        js = (
+            'js/mootools-1.2.3-core-yc.js',
+            'js/display_roles.js',
+        )
+"""
 
 class MembershipInline(admin.TabularInline): # for all membership inline admin
     form = MembershipForm    
@@ -29,8 +53,6 @@ class MembershipForEntityInline(MembershipInline): # for Entity admin
     exclude = ('order',)
 
 class MembershipForPersonInline(MembershipInline): # for Person admin
-    class Meta:
-        ordering = ('entity',)
     exclude = ('membership_order',)
 
 class PersonForm(forms.ModelForm):
@@ -129,6 +151,7 @@ class TitleAdmin(admin.ModelAdmin):
 class MembershipAdmin(admin.ModelAdmin):
     list_display = ('person', 'entity', 'order', 'membership_order',)
     ordering = ['person',]
+    form = MembershipForm
     
 
 
