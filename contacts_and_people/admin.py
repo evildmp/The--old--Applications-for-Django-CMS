@@ -59,8 +59,22 @@ class MembershipForEntityInline(MembershipInline): # for Entity admin
 class MembershipForPersonInline(MembershipInline): # for Person admin
     exclude = ('membership_order',)
 
+class DisplayUsernameWidget(forms.Widget):
+    def render(self, name, value, attrs=None):
+        user = User.objects.get(pk=value)
+        return mark_safe(u"<span>Assigned user: <strong>%s</stron></span>" % user)
+
 class PersonForm(forms.ModelForm):
     model = models.Person
+    
+    def __init__(self, *args, **kwargs):
+        # disable the user combo if a user aleady has been assigned
+        super(PersonForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.id and not instance.user==None:
+            self.fields['user'].widget = DisplayUsernameWidget()
+            self.fields['user'].help_text = "Once a user has been assigned, it cannot be changed"
+        
     
     def clean_please_contact(self):
         data = self.cleaned_data['please_contact']
