@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 from django import forms
 from django.forms import ValidationError
 
+from django.utils.safestring import mark_safe 
+
 class MembershipForm(forms.ModelForm): # cleans up membership & role information
     pass
 """
@@ -63,9 +65,16 @@ class PersonForm(forms.ModelForm):
     def clean_please_contact(self):
         data = self.cleaned_data['please_contact']
         # only do the check when in "change" mode. there can't be a loop if in "new" mode
-        if hasattr(self, 'instance'):
-            if data.check_please_contact_loop(self.instance)==False:
-                raise forms.ValidationError("Please prevent loops")
+        # because nobody can link to us if we did not exist yet before.
+        if hasattr(self, 'instance') and type(self.instance) == type(data):
+            self.instance.please_contact = data
+            has_loop_error, person_list = self.instance.check_please_contact_has_loop(self.instance)
+            if has_loop_error:
+                r = []
+                for p in person_list:
+                    r.append(u'"%s"' % p)
+                r = u' &rarr; '.join(r)    
+                raise forms.ValidationError(mark_safe(u"Please prevent loops: %s" % r))
         return data
     print "sorting person order!"
     class Media:

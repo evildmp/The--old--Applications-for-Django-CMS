@@ -111,18 +111,23 @@ class Person(ContactInformation):
     def get_absolute_url(self):
         return "/person/%s/" % self.slug
     
-    def check_please_contact_loop(self, compare_to):
+    def check_please_contact_has_loop(self, compare_to, person_list=None):
+        if person_list==None:
+            person_list=[compare_to]
+        if not self==compare_to:
+            person_list.append(self)
         if self.please_contact:
             if compare_to==self.please_contact:
-                return False
+                person_list.append(compare_to)
+                return True, person_list
             else:
-                return self.please_contact.check_please_contact_loop(compare_to)
+                return self.please_contact.check_please_contact_has_loop(compare_to, person_list)
         else:
-            return True
+            return False, person_list
     
     def save(self, *args, **kwargs):
         do_check_please_contact_loop = kwargs.pop('do_check_please_contact_loop', True)
-        if do_check_please_contact_loop and self.check_please_contact_loop(compare_to=self)==False:
+        if do_check_please_contact_loop and self.check_please_contact_has_loop(compare_to=self)==True:
             raise Exception # TODO: raise a more appropriate exception
         return super(Person, self).save(*args, **kwargs)
 
