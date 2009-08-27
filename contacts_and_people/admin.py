@@ -231,15 +231,6 @@ if getattr(settings,"ENABLE_CONTACTS_AND_PEOPLE_AUTH_ADMIN_INTEGRATION", False):
     
     class MyNoPasswordCapableUserCreationForm(UserCreationForm):
         has_password = forms.BooleanField(required=False, initial=True)
-        def __init__(self, *args, **kwargs):
-            r = super(MyNoPasswordCapableUserCreationForm,self).__init__(*args, **kwargs)
-            instance = kwargs.get('instance',None)
-            if instance:
-                if instance.has_usable_password():
-                    self.initial['has_password'] = True
-                else:
-                    self.initial['has_password'] = False     
-            return r
         def clean(self):
             data = self.cleaned_data
             if self.cleaned_data['has_password'] in (False, None,):
@@ -267,7 +258,7 @@ if getattr(settings,"ENABLE_CONTACTS_AND_PEOPLE_AUTH_ADMIN_INTEGRATION", False):
         def __init__(self, *args, **kwargs):
             r = super(MyNoPasswordCapableUserChangeForm,self).__init__(*args, **kwargs)
             instance = kwargs.get('instance',None)
-            if instance:
+            if instance and instance.id:
                 if instance.has_usable_password():
                     self.initial['has_password'] = True
                 else:
