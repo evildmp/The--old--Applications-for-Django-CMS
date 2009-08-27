@@ -2,6 +2,8 @@ import models
 from django.db.models import F
 from django.db.models import Q
 
+from django.conf import settings
+
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django import forms
@@ -167,8 +169,7 @@ admin.site.register(models.Membership,MembershipAdmin)
 
 
 # admin hacks
-use_admin_hacks = True
-if use_admin_hacks:
+if getattr(settings,"ENABLE_CONTACTS_AND_PEOPLE_AUTH_ADMIN_INTEGRATION", False):
     admin.site.unregister(User)
     
     from django import template
@@ -247,7 +248,8 @@ if use_admin_hacks:
                 instance.set_unusable_password()
             if commit:
                 instance.save()
-                instance.save_m2m()
+                if hasattr(instance, 'save_m2m'):
+                    instance.save_m2m()
                 return instance
             else:
                 return instance
