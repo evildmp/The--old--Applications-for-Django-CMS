@@ -110,6 +110,21 @@ class Person(ContactInformation):
         return str(self.given_name + " " + self.middle_names + " " + self.surname)
     def get_absolute_url(self):
         return "/person/%s/" % self.slug
+    
+    def check_please_contact_loop(self, compare_to):
+        if self.please_contact:
+            if compare_to==self.please_contact:
+                return False
+            else:
+                return self.please_contact.check_please_contact_loop(compare_to)
+        else:
+            return True
+    
+    def save(self, *args, **kwargs):
+        do_check_please_contact_loop = kwargs.pop('do_check_please_contact_loop', True)
+        if do_check_please_contact_loop and self.check_please_contact_loop(compare_to=self)==False:
+            raise Exception # TODO: raise a more appropriate exception
+        return super(Person, self).save(*args, **kwargs)
 
 class Membership(models.Model):
     class Meta:

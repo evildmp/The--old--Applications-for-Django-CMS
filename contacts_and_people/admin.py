@@ -59,6 +59,14 @@ class MembershipForPersonInline(MembershipInline): # for Person admin
 
 class PersonForm(forms.ModelForm):
     model = models.Person
+    
+    def clean_please_contact(self):
+        data = self.cleaned_data['please_contact']
+        # only do the check when in "change" mode. there can't be a loop if in "new" mode
+        if hasattr(self, 'instance'):
+            if data.check_please_contact_loop(self.instance)==False:
+                raise forms.ValidationError("Please prevent loops")
+        return data
     print "sorting person order!"
     class Media:
         js = (
