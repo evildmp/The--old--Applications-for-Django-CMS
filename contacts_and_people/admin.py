@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.conf import settings
 
 from django.contrib import admin
+from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from django import forms
 from django.forms import ValidationError
@@ -59,6 +60,10 @@ class MembershipForEntityInline(MembershipInline): # for Entity admin
 class MembershipForPersonInline(MembershipInline): # for Person admin
     exclude = ('membership_order',)
 
+class PhoneContactInline(generic.GenericTabularInline):
+    extra = 3
+    model = models.PhoneContact
+
 class DisplayUsernameWidget(forms.Widget):
     def render(self, name, value, attrs=None):
         user = User.objects.get(pk=value)
@@ -110,7 +115,7 @@ class EntityForm(forms.ModelForm):
         )
 
 class PersonAdmin(admin.ModelAdmin):
-    inlines = (MembershipForPersonInline,)
+    inlines = (MembershipForPersonInline,PhoneContactInline)
     form = PersonForm
     list_display = ( 'surname', 'given_name', 'user', 'slug')
     list_editable = ('user',)
@@ -134,7 +139,7 @@ class PersonAdmin(admin.ModelAdmin):
     )
 
 class EntityAdmin(admin.ModelAdmin):
-    inlines = (MembershipForEntityInline,)
+    inlines = (MembershipForEntityInline,PhoneContactInline,)
     form = EntityForm
     list_display = ('name', 'parent', 'building', 'abstract_entity','website', )
     prepopulated_fields = {
@@ -185,7 +190,6 @@ class MembershipAdmin(admin.ModelAdmin):
     list_display = ('person', 'entity', 'order', 'membership_order',)
     ordering = ['person',]
     form = MembershipForm
-    
 
 
 admin.site.register(models.Person,PersonAdmin)
@@ -196,6 +200,11 @@ admin.site.register(models.Title,TitleAdmin)
 admin.site.register(models.Membership,MembershipAdmin)
 
 
+# tmp:
+
+admin.site.register([models.PhoneContact, models.PhoneContactLabel])
+
+# ---
 
 
 

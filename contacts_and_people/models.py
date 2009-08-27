@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from cms.models import Page, CMSPlugin
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
@@ -43,6 +45,27 @@ class Building(models.Model):
         super(Building, self).save()
     def get_absolute_url(self):
         return "/places/%s/" % self.slug
+
+class PhoneContactLabel(models.Model):
+    name = models.CharField(max_length=255)
+    
+    def __unicode__(self):
+        return u"%s" % self.name
+
+class PhoneContact(models.Model):
+    PHONE_TYPE_CHOICES = (('landline', 'landline'),
+                          ('mobile','mobile'),
+                          ('fax','fax'),
+                          )
+    label = models.ForeignKey(PhoneContactLabel, null=True, blank=True)
+    type = models.CharField(max_length=24, choices=PHONE_TYPE_CHOICES, default=PHONE_TYPE_CHOICES[0][0])
+    number = models.CharField(max_length=15)
+    
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.IntegerField(db_index=True)
+    content_object = generic.GenericForeignKey()
+    def __unicode__(self):
+        return u"%s %s (%s)" % (self.label, self.number, self.type) 
 
 class ContactInformation(models.Model):
     class Meta:
