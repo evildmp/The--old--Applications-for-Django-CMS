@@ -17,6 +17,8 @@ Add:
     (r"^person/(?P<slug>[-\w]+)/$", "contacts_and_people.views.person"),
     (r"^news/article/(?P<slug>[-\w]+)/$", "news_and_events.views.newsarticle"),
     (r"^events/event/(?P<slug>[-\w]+)/$", "news_and_events.views.event"),
+    
+    (r'^news/rss/', include('news_and_events.feeds_urls')),
 
 to your urlpatterns = patterns in urls.py.
 
