@@ -7,6 +7,8 @@ from django.utils.translation import ugettext_lazy as _, get_language
 from news_and_events.models import NewsArticle
 from contacts_and_people.models import Entity, Person
 
+STANDARD_FEED_ENTRY_COUNT = getattr(settings,'STANDARD_FEED_ENTRY_COUNT', 5)
+
 class LatestNewsArticles(Feed):
     title = "cardiff news"
     description = "all the cardiff news in one place"
@@ -24,7 +26,7 @@ class LatestNewsArticlesForEntity(LatestNewsArticles):
             raise ObjectDoesNotExist
         return Entity.objects.get(slug__exact=bits[0])
     def items(self, obj):
-        return NewsArticle.objects.filter(publishing_destinations=obj).order_by('-date')
+        return NewsArticle.objects.filter(publishing_destinations=obj).order_by('-date')[:STANDARD_FEED_ENTRY_COUNT]
     
     def title(self, obj):
         return u'%s' % obj
@@ -42,7 +44,7 @@ class LatestNewsArticlesForContactPerson(LatestNewsArticles):
             raise ObjectDoesNotExist
         return Person.objects.get(slug__exact=bits[0])
     def items(self, obj):
-        return NewsArticle.objects.filter(please_contact=obj).order_by('-date')
+        return NewsArticle.objects.filter(please_contact=obj).order_by('-date')[:STANDARD_FEED_ENTRY_COUNT]
     
     def title(self, obj):
         return u'%s' % obj
@@ -59,7 +61,7 @@ class LatestNewsArticlesForRelatedPerson(LatestNewsArticles):
             raise ObjectDoesNotExist
         return Person.objects.get(slug__exact=bits[0])
     def items(self, obj):
-        return NewsArticle.objects.filter(related_people=obj).order_by('-date')
+        return NewsArticle.objects.filter(related_people=obj).order_by('-date')[:STANDARD_FEED_ENTRY_COUNT]
     
     def title(self, obj):
         return u'%s' % obj
