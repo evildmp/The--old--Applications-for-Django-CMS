@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _, get_language
 
 from news_and_events.models import NewsArticle
-from contacts_and_people.models import Entity
+from contacts_and_people.models import Entity, Person
 
 class LatestNewsArticles(Feed):
     title = "cardiff news"
@@ -17,8 +17,8 @@ class LatestNewsArticles(Feed):
     
     def items(self):
         return NewsArticle.objects.order_by('-date')
-
-class LatestEntityNewsArticles(LatestNewsArticles):
+    
+class LatestNewsArticlesForEntity(LatestNewsArticles):
     def get_object(self, bits):
         if len(bits) != 1:
             raise ObjectDoesNotExist
@@ -35,6 +35,40 @@ class LatestEntityNewsArticles(LatestNewsArticles):
     def description(self, obj):
         return 'News relevant for the entity "%s"' % obj
 
+
+class LatestNewsArticlesForContactPerson(LatestNewsArticles):
+    def get_object(self, bits):
+        if len(bits) != 1:
+            raise ObjectDoesNotExist
+        return Person.objects.get(slug__exact=bits[0])
+    def items(self, obj):
+        return NewsArticle.objects.filter(please_contact=obj).order_by('-date')
+    
+    def title(self, obj):
+        return u'%s' % obj
+    def link(self, obj):
+        if not obj:
+            raise FeedDoesNotExist
+        return obj.get_absolute_url()
+    def description(self, obj):
+        return 'News with the contact "%s"' % obj
+
+class LatestNewsArticlesForRelatedPerson(LatestNewsArticles):
+    def get_object(self, bits):
+        if len(bits) != 1:
+            raise ObjectDoesNotExist
+        return Person.objects.get(slug__exact=bits[0])
+    def items(self, obj):
+        return NewsArticle.objects.filter(related_people=obj).order_by('-date')
+    
+    def title(self, obj):
+        return u'%s' % obj
+    def link(self, obj):
+        if not obj:
+            raise FeedDoesNotExist
+        return obj.get_absolute_url()
+    def description(self, obj):
+        return 'News with the the related person "%s"' % obj
 
         
 

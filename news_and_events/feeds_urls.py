@@ -7,7 +7,9 @@ from news_and_events import feeds
 
 feeds = {
     'latest': feeds.LatestNewsArticles,
-    'latest_by_entity': feeds.LatestEntityNewsArticles,
+    'latest_by_entity': feeds.LatestNewsArticlesForEntity,
+    'latest_by_contact_person': feeds.LatestNewsArticlesForContactPerson,
+    'latest_by_related_person': feeds.LatestNewsArticlesForRelatedPerson,
 }
 
 urlpatterns = patterns('',
