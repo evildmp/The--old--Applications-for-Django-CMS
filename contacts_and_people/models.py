@@ -5,6 +5,7 @@ from cms.models import Page, CMSPlugin
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django import forms
+from image_filer.fields import ImageFilerModelImageField
 
 import mptt
 
@@ -16,6 +17,7 @@ class Site(models.Model):
     post_town = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
     description = models.TextField(max_length = 500, null = True, blank=True)
+    image = ImageFilerModelImageField(null=True, blank=True)
     def __unicode__(self):
         return self.site_name
 
@@ -31,7 +33,8 @@ class Building(models.Model):
     site = models.ForeignKey(Site)
     slug = models.SlugField(null = True, blank=True)
     longitude = models.FloatField()
-    latitude = models.FloatField()    
+    latitude = models.FloatField()
+    image = ImageFilerModelImageField(null=True, blank=True)
     def __unicode__(self):
         if self.name:
             building_identifier = str(self.site) + ": " + self.name
@@ -95,6 +98,7 @@ class Entity(ContactInformation):
     display_parent = models.BooleanField(default=True, help_text=u'If the parent should appear in the address')
     website = models.ForeignKey(Page, related_name = 'entity', unique = True, null = True, blank=True)
 #    roles = models.ManyToManyField('Role', null = True, blank=True)
+    image = ImageFilerModelImageField(null=True, blank=True)
     def __unicode__(self):
         return self.name
     def get_absolute_url(self):
@@ -121,6 +125,9 @@ class Person(ContactInformation):
 #    job_title = models.CharField(max_length=50, blank = True, null = True)
     override_entity = models.ForeignKey(Entity, verbose_name = 'Override address', help_text= u"Get the person's address from an alternative entity", related_name = 'people_override', blank = True, null = True)
     please_contact = models.ForeignKey('self', help_text=u"Publish alternative contact details for this person", related_name='contact_for', blank = True, null = True)
+    
+    image = ImageFilerModelImageField(null=True, blank=True)
+    
     def gather_entities(self):
         entitylist = set()
 #        entitylist.add(self.home_entity)
