@@ -24,3 +24,11 @@ to your urlpatterns = patterns in urls.py.
 
 A syncdb will be required.
 
+
+these rss feeds are available:
+
+/news/rss/latest/										all news
+/news/rss/latest_by_entity/<entity-slug>/				all news entries for the entity
+/news/rss/latest_by_contact_person/<person-slug>/		all news entries where the person is the contact person
+/news/rss/latest_by_related_person/<person-slug>/		all news entries where the person is mentioned in related person
+
